@@ -4,10 +4,22 @@ block modal-header-content
   h1(data-i18n="teacher.not_assigned_modal_title")
 
 block modal-body-content
-  p= translate("teacher.not_assigned_modal_body_1").replace('{{selected}}', view.selected)
-  p= translate("teacher.not_assigned_modal_body_2").replace('{{totalSpotsAvailable}}', view.totalSpotsAvailable).replace('{{unenrolledStudents}}', view.unenrolledStudents)
-  p!= translate("teacher.not_assigned_modal_body_3").replace('{{email}}', "<a href='mailto:support@codecombat.com'>support@codecombat.com</a>")
-  
+  if view.promoteStarterLicenses
+    p.small= translate("teacher.not_assigned_modal_starter_body_1", { selected: view.selected })
+    p.small= translate("teacher.not_assigned_modal_starter_body_2")
+  else
+    p.small= translate("teacher.not_assigned_modal_full_body_1", { selected: view.selected })
+    p.small= translate("teacher.not_assigned_modal_full_body_2", { full_licenses_available: view.fullLicensesAvailable, num_students_without_full_licenses: view.numStudentsWithoutFullLicenses })
+    p.small!= translate("teacher.not_assigned_modal_full_body_3", { support_email: "<a href='mailto:support@codecombat.com'>support@codecombat.com</a>" })
 
 block modal-footer-content
-  button.btn.btn-primary(data-dismiss="modal", data-i18n="modal.okay")
+  if view.promoteStarterLicenses
+    a.btn.btn-navy(data-i18n="TODO" href="/teachers/starter-licenses")
+      | Learn More
+  else
+    button.btn.btn-forest.pull-left
+      span(data-i18n="TODO")
+        | Contact Us
+    button.btn.btn-navy.pull-right(data-dismiss="modal")
+      span(data-i18n="TODO")
+        | Close Window

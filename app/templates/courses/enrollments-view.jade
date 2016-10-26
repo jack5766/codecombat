@@ -32,6 +32,25 @@ block content
             | Please convert your account to ensure you retain access to your classrooms.
           a.btn.btn-primary.btn-lg(href="/teachers/update-account") Upgrade to teacher account
 
+    if view.state.get('shouldUpsell')
+      .bg-forest
+        .container
+          .row
+            .col-xs-9.m-t-1
+              b
+                span.text-uppercase(data-i18n="TODO")
+                  | Special offer
+                =': '
+                span(data-i18n="TODO")
+                  | Student Starter License
+              .small-details
+                i(data-i18n="TODO")
+                  | Purchase Starter Licenses to grant access to Computer Science 2, Web Development 1, and Game Development 1
+            .col-xs-3
+              a.btn.btn-lg.btn-forest-alt.m-t-2.m-b-2(href="/teachers/starter-licenses")
+                b(data-i18n="TODO")
+                  | Learn More
+
     .container.m-t-5
       .pull-right
         span.glyphicon.glyphicon-question-sign

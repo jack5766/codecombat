@@ -32,6 +32,7 @@ module.exports = class EnrollmentsView extends RootView
         'available': []
         'pending': []
       }
+      shouldUpsell: true
     })
     window.tracker?.trackEvent 'Classes Licenses Loaded', category: 'Teachers', ['Mixpanel']
     super(options)

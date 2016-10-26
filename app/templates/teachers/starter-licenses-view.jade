@@ -1,0 +1,148 @@
+extends /templates/base-flat
+
+block page_nav
+  include /templates/courses/teacher-dashboard-nav.jade
+
+block content
+  .bg-forest
+    .container.text-center
+      .m-t-1.m-b-1
+        b.small-details.text-uppercase(data-i18n="TODO")
+          | Special offer
+        h3(data-i18n="TODO")
+          | Student Starter License
+        .small-details
+          i(data-i18n="TODO")
+            | Purchase Starter Licenses to grant access to Computer Science 2, Web Development 1, and Game Development 1
+
+  .container
+    .row.tall-margin
+      .checkmark-blurb.col-xs-4.text-center
+        span.fa.fa-check(aria-hidden=true)
+        h5(data-i18n="special_offer.project_based_title") 
+        p.small(data-i18n="special_offer.project_based_description")
+      .checkmark-blurb.col-xs-4.text-center
+        span.fa.fa-check(aria-hidden=true)
+        h5(data-i18n="special_offer.great_for_clubs_title")
+        p.small(data-i18n="special_offer.great_for_clubs_description")
+      .checkmark-blurb.col-xs-4.text-center
+        span.fa.fa-check(aria-hidden=true)
+        h5= translate('special_offer.low_price_title', {'starter_license_price': view.state.get('pricePerStudent')})
+        p.small(data-i18n="special_offer.low_price_description")
+  
+    .row.text-center.tall-margin-top
+      h2
+        span(data-i18n="TODO")
+          | Three great courses included in the Starter License:
+    .row.tall-margin-bottom.m-t-2
+      .col-xs-4
+        .text-center
+          img(src="TODO" width=150 height=150)
+        b(data-i18n="TODO")
+          | Computer Science 2
+        =' '
+        span(data-i18n="TODO")
+          | builds on the foundation from Introduction to Computer Science, diving into if-statements, functions, events and more.
+      .col-xs-4
+        .text-center
+          img(src="TODO" width=150 height=150)
+        b(data-i18n="TODO")
+          | Web Development 1
+        =' '
+        span(data-i18n="TODO")
+          | introduces the basics of HTML and CSS while teaching skills needed for students to build their first webpage.
+        div
+          a(href="TODO")
+            span(data-i18n="TODO")
+              | see an example project
+      .col-xs-4
+        .text-center
+          img(src="TODO" width=150 height=150)
+        b(data-i18n="TODO")
+          | Game Development 1
+        =' '
+        span(data-i18n="TODO")
+          | uses syntax students are already familiar with to show them how to build and share their own playable game levels.
+        div
+          a(href="TODO")
+            span(data-i18n="TODO")
+              | see an example project
+
+    .row.text-center.tall-margin
+      h2.m-b-2
+        span(data-i18n="TODO")
+          | Get started today!
+      a.purchase-btn.btn.btn-lg.btn-navy
+        span(data-i18n="TODO")
+          | Purchase Starter Licenses
+      .m-t-3
+        span(data-i18n="TODO")
+          | Want all the courses? Request information on our Full Licenses.  
+      a.contact-us-btn.btn.btn-forest
+        span(data-i18n="TODO")
+          | Contact Us
+          
+    .row.text-center.tall-margin
+      h2.m-b-3
+        span(data-i18n="TODO")
+          | Compare License Types:
+
+      table.feature-comparison-table
+        tr
+          th
+          th
+          th.special-offer-col
+            i
+              b Special Offer
+          th
+        tr
+          th
+          th(data-i18n="TODO") Trial
+          th.special-offer-col(data-i18n="TODO") Starter License
+          th(data-i18n="TODO") Full License
+        tr
+          th Computer Science
+          td Course 1
+          td.special-offer-col Course 1–2
+          td Courses 1–5+
+        tr
+          th Game Development
+          td x
+          td.special-offer-col Course 1
+          td Courses 1–2+
+        tr
+          th Web Development
+          td x
+          td.special-offer-col Course 1
+          td Courses 1–2+
+        tr
+          th Maximum # of students
+          td Unlimited
+          td.special-offer-col 75
+          td Unlimited
+        tr
+          th Priority support
+          td x
+          td.special-offer-col x
+          td Yes
+        tr
+          th Pricing
+          td Free
+          //- TODO: Do we localize prices at all?
+          td.special-offer-col
+            | $
+            = view.state.get('pricePerStudent')
+            =' '
+            | per student
+          td Contact Us
+        tr
+          th
+          th
+          th.special-offer-col
+            a.purchase-button.btn.btn-navy
+              b(data-i18n="TODO")
+                | Purchase
+          th
+            a.contact-us-btn.btn.btn-forest
+              b(data-i18n="TODO")
+                | Contact Us

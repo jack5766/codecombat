@@ -852,6 +852,13 @@
     more_info_3: "is a good place to connect with fellow educators who are using CodeCombat."
     licenses_needed: "Licenses needed"
 
+  special_offer:
+    project_based_title: "Project-Based Courses"
+    project_based_description: "Web and Game Development courses feature shareable final projects."
+    great_for_clubs_title: "Great for clubs and electives"
+    great_for_clubs_description: "Teachers can purchase up to 75 Starter Licenses per year."
+    low_price_title: "Just $__starter_license_price__ per student"
+    low_price_description: "Starter Licenses are active for 6 months from purchase."
 
   teachers_quote:
     name: "Demo Form"
@@ -1420,6 +1427,14 @@
     assigned_msg_3: "You now have {{remainingSpots}} available licenses remaining."
     assign_course: "Assign Course"
     not_assigned_modal_title: "Courses were not assigned"
+    # TODO: Get final copy of these 4 from doc
+    not_assigned_modal_starter_body_1: "This course requires a Starter License. You do not have enough Starter Licenses available to assign this course to all 3 selecter students."
+    not_assigned_modal_starter_body_2: "Purchase Starter Licenses to grant access to this course."
+    not_assigned_modal_full_body_1: "This course requires a Full License. You do not have enough Full Licenses available to assign this course to all 3 selected students."
+    not_assigned_modal_full_body_2: "You only have __full_licenses_available__ Full Licenses available (__num_students_without_full_licenses__ students do not currently have a Full License active)."
+    not_assigned_modal_full_body_3: "Please select fewer students, or reach out to __support_email__ for assistance"
+    
+    
     not_assigned_modal_body_1: "You do not have enough licenses available to assign additional Courses to all {{selected}} selected students."
     not_assigned_modal_body_2: "You only have {{totalSpotsAvailable}} licenses available ({{unenrolledStudents}} students did not have an active license)."
     not_assigned_modal_body_3: "Please select fewer students, or reach out to {{email}} for assistance."
