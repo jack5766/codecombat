@@ -52,6 +52,10 @@ module.exports = class EnrollmentsView extends RootView
     @listenTo(@state, 'all', @debouncedRender)
     @listenTo(me, 'change:enrollmentRequestSent', @debouncedRender)
 
+    leadPriorityRequest = me.getLeadPriority()
+    @supermodel.trackRequest leadPriorityRequest
+    leadPriorityRequest.then(({ priority }) => @state.set({ shouldUpsell: (priority is 'low') }))
+
   onceClassroomsSync: ->
     for classroom in @classrooms.models
       @supermodel.trackRequests @members.fetchForClassroom(classroom, {remove: false, removeDeleted: true})

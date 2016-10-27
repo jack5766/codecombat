@@ -359,6 +359,9 @@ module.exports = class User extends CocoModel
     return null unless coursePrepaid
     Prepaid = require 'models/Prepaid'
     return new Prepaid(coursePrepaid)
+  
+  getLeadPriority: ->
+    $.get('/db/user/-/lead-priority')
 
   becomeStudent: (options={}) ->
     options.url = '/db/user/-/become-student'

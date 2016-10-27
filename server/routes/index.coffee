@@ -144,6 +144,7 @@ module.exports.setup = (app) ->
   app.get('/db/user', mw.users.fetchByGPlusID, mw.users.fetchByFacebookID)
   app.put('/db/user/-/become-student', mw.users.becomeStudent)
   app.put('/db/user/-/remain-teacher', mw.users.remainTeacher)
+  app.get('/db/user/-/lead-priority', mw.auth.checkLoggedIn(), mw.users.getLeadPriority)
   app.post('/db/user/:userID/request-verify-email', mw.users.sendVerificationEmail)
   app.post('/db/user/:userID/verify/:verificationCode', mw.users.verifyEmailAddress) # TODO: Finalize URL scheme
   app.get('/db/user/-/students', mw.auth.checkHasPermission(['admin']), mw.users.getStudents)
@@ -182,4 +183,4 @@ module.exports.setup = (app) ->
 
   app.all('/headers', mw.headers)
   
-  app.get('/healthcheck', mw.healthcheck)  
+  app.get('/healthcheck', mw.healthcheck)
