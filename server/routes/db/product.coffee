@@ -72,6 +72,11 @@ productStubs = [
   }
 
   {
+    name: 'starter_license'
+    amount: 10
+  }
+
+  {
     name: 'brazil_basic_subscription'
     amount: 0
     gems: 1500

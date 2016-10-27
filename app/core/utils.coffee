@@ -308,8 +308,11 @@ getPrepaidCodeAmount = (price=0, users=0, months=0) ->
   total = price * users * months
   total
 
+formatDollarValue = (dollars) ->
+  '$' + (parseFloat(dollars).toFixed(2))
+
 startsWithVowel = (s) -> s[0] in 'aeiouAEIOU'
-  
+
 filterMarkdownCodeLanguages = (text, language) ->
   return '' unless text
   currentLanguage = language or me.get('aceConfig')?.language or 'python'
@@ -546,6 +549,7 @@ module.exports = {
   extractPlayerCodeTag
   filterMarkdownCodeLanguages
   findNextLevel
+  formatDollarValue
   functionCreators
   getByPath
   getCourseBundlePrice

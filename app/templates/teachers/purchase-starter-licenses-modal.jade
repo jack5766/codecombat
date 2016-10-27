@@ -1,0 +1,29 @@
+extends /templates/core/modal-base-flat
+
+block modal-header-content
+  .text-center
+    h3(data-i18n="TODO")
+
+block modal-body-content
+  p(data-i18n="TODO")
+    | Starter Licenses can be used to assign additional courses immediately after purchase.
+  
+  .text-center.input-row
+    input(name="quantity", type="number", min=0, max=75, value=state.get('quantityToBuy'))
+    span x
+    span.dollar-value= view.getPricePerStudentString()
+    span =
+    span.dollar-value= view.getTotalPriceString()
+  
+  .text-center
+    button.btn-lg.btn-navy
+      span(data-i18n="TODO")
+        | Pay Now
+  
+  p.text-center.m-t-1(data-i18n="TODO")
+    | We accept all major credit cards.
+  
+  p.small.m-t-3(data-i18n="TODO")
+    | Teachers can purchase up to {{starter_license_quantity_limit}} Starter Licenses. If you need more, contact support@codecombat.com. Starter Licenses are valid for {{starter_license_length_months}} months.
+    
+    
