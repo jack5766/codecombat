@@ -75,7 +75,7 @@ module.exports =
     q = {
       _id: { $gt: cutoffID }
       creator: mongoose.Types.ObjectId(creator)
-      type: 'course'
+      type: { $in: ['course', 'starter_license'] }
     }
 
     prepaids = yield Prepaid.find(q)

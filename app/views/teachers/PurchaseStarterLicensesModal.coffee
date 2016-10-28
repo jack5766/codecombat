@@ -2,6 +2,7 @@ ModalView = require 'views/core/ModalView'
 State = require 'models/State'
 utils = require 'core/utils'
 Products = require 'collections/Products'
+Prepaids = require 'collections/Prepaids'
 stripeHandler = require 'core/services/stripe'
 
 module.exports = class PurchaseStarterLicensesModal extends ModalView
@@ -9,7 +10,11 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
   template: require 'templates/teachers/purchase-starter-licenses-modal'
   
   maxQuantityStarterLicenses: 75
-  i18nData: -> { @maxQuantityStarterLicenses, starterLicenseLengthMonths: 6 }
+  i18nData: -> {
+    @maxQuantityStarterLicenses,
+    starterLicenseLengthMonths: 6,
+    quantityAlreadyPurchased: @state.get('quantityAlreadyPurchased')
+  }
   
   events:
     'input input[name="quantity"]': 'onInputQuantity'
@@ -21,13 +26,22 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     @state = new State({
       quantityToBuy: 10
       pricePerStudent: undefined
-      maxQuantity: 75
+      quantityAlreadyPurchased: undefined
+      quantityAllowedToPurchase: undefined
     })
     @products = new Products()
     @supermodel.loadCollection(@products, 'products')
     @listenTo @products, 'sync change update', ->
       starterLicense = @products.findWhere({ name: 'starter_license' })
       @state.set { pricePerStudent: starterLicense.get('amount')/100 }
+    @prepaids = new Prepaids()
+    @supermodel.trackRequest @prepaids.fetchByCreator(me.id)
+    @listenTo @prepaids, 'sync change update', ->
+      starterLicenses = new Prepaids(@prepaids.where({ type: 'starter_license' }))
+      @state.set {
+        quantityAlreadyPurchased: starterLicenses.totalMaxRedeemers()
+        quantityAllowedToPurchase: @maxQuantityStarterLicenses - starterLicenses.totalMaxRedeemers()
+      }
     @listenTo @state, 'change', => @renderSelectors('.dollar-value', '.purchase-progress-message')
     super(options)
   
@@ -38,14 +52,16 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
   getTotalPriceString: -> utils.formatDollarValue(@state.get('pricePerStudent') * @state.get('quantityToBuy'))
 
     
+  
   onInputQuantity: (e) ->
     $input = $(e.currentTarget)
     inputValue = parseFloat($input.val()) or 0
+    boundedValue = inputValue
     if $input.val() isnt ''
-      boundedValue = Math.max(Math.min(inputValue, @maxQuantityStarterLicenses), 0)
+      boundedValue = Math.max(Math.min(inputValue, @maxQuantityStarterLicenses - @state.get('quantityAlreadyPurchased')), 0)
       if boundedValue isnt inputValue
         $input.val(boundedValue)
-    @state.set { quantityToBuy: inputValue }
+    @state.set { quantityToBuy: boundedValue }
     
   onClickPayNowButton: ->
     @state.set({
@@ -81,7 +97,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
       success: ->
         application.tracker?.trackEvent 'Finished starter license purchase', {price: @state.get('pricePerStudent'), seats: @state.get('quantityToBuy')}
         @state.set({ purchaseProgress: 'purchased' })
-        @render?()
+        application.router.navigate('/teachers/licenses', { trigger: true })
 
       error: (jqxhr, textStatus, errorThrown) ->
         application.tracker?.trackEvent 'Failed starter license purchase', status: textStatus

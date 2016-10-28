@@ -10,7 +10,7 @@ block modal-body-content
     | Starter Licenses can be used to assign additional courses immediately after purchase.
   
   .text-center.input-row.m-t-3.m-b-3
-    input(name="quantity", type="number", min=0, max=75, value=state.get('quantityToBuy'))
+    input(name="quantity", type="number", min=0, max=state.get('quantityAllowedToPurchase'), value=state.get('quantityToBuy'))
     span x
     span.dollar-value= view.getPricePerStudentString()
     span =
