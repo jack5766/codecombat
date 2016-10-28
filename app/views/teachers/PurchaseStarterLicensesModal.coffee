@@ -74,7 +74,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
         timestamp: new Date().getTime()
 
     $.ajax({
-      url: '/db/prepaid/-/purchase',
+      url: '/db/starter-license-prepaid',
       data: data,
       method: 'POST',
       context: @

@@ -95,7 +95,7 @@ PrepaidHandler = class PrepaidHandler extends Handler
 
   purchasePrepaidAPI: (req, res) ->
     return @sendUnauthorizedError(res) if not req.user? or req.user?.isAnonymous()
-    return @sendForbiddenError(res) unless req.body.type in ['course', 'terminal_subscription', 'starter_license']
+    return @sendForbiddenError(res) unless req.body.type in ['course', 'terminal_subscription']
 
     if req.body.type is 'terminal_subscription'
       description = req.body.description
@@ -128,25 +128,6 @@ PrepaidHandler = class PrepaidHandler extends Handler
         return @sendNotFoundError(res, 'course product not found') if not product
 
         @purchasePrepaidCourse req.user, maxRedeemers, timestamp, token, product, (err, prepaid) =>
-          # TODO: this badinput detection is fragile, in course instance handler as well
-          return @sendBadInputError(res, err) if err is 'Missing required Stripe token'
-          return @sendDatabaseError(res, err) if err
-          @sendSuccess(res, prepaid.toObject())
-
-    else if req.body.type is 'starter_license'
-      console.log "Purchasing starter license..."
-      maxRedeemers = parseInt(req.body.maxRedeemers)
-      timestamp = req.body.stripe?.timestamp
-      token = req.body.stripe?.token
-
-      if isNaN(maxRedeemers) or !(maxRedeemers > 0 && maxRedeemers <= 75) # TODO: Check for already owned starter licenses
-        return @sendBadInputError(res)
-
-      Product.findOne({name: 'starter_license'}).exec (err, product) =>
-        return @sendDatabaseError(res, err) if err
-        return @sendNotFoundError(res, 'starter_license product not found') if not product
-
-        @purchasePrepaidStarterLicense req.user, maxRedeemers, timestamp, token, product, (err, prepaid) =>
           # TODO: this badinput detection is fragile, in course instance handler as well
           return @sendBadInputError(res, err) if err is 'Missing required Stripe token'
           return @sendDatabaseError(res, err) if err
