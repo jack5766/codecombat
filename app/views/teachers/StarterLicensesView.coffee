@@ -15,10 +15,9 @@ module.exports = class StarterLicensesView extends RootView
     @state = new State({
       pricePerStudent: 1000
     })
-    @purchaseStarterLicensesModal = new PurchaseStarterLicensesModal
 
   onClickPurchaseButton: ->
-    @openModalView(@purchaseStarterLicensesModal)
+    @openModalView(new PurchaseStarterLicensesModal())
 
   onClickContactUsButton: ->
     window.tracker?.trackEvent 'Classes Starter Licenses Upsell Contact Us', category: 'Teachers', ['Mixpanel']

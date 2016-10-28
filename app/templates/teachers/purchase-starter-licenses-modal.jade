@@ -3,12 +3,13 @@ extends /templates/core/modal-base-flat
 block modal-header-content
   .text-center
     h3(data-i18n="TODO")
+      | Purchase Starter Licenses
 
 block modal-body-content
   p(data-i18n="TODO")
     | Starter Licenses can be used to assign additional courses immediately after purchase.
   
-  .text-center.input-row
+  .text-center.input-row.m-t-3.m-b-3
     input(name="quantity", type="number", min=0, max=75, value=state.get('quantityToBuy'))
     span x
     span.dollar-value= view.getPricePerStudentString()
@@ -16,14 +17,17 @@ block modal-body-content
     span.dollar-value= view.getTotalPriceString()
   
   .text-center
-    button.btn-lg.btn-navy
+    button.pay-now-btn.btn-lg.btn-navy
       span(data-i18n="TODO")
         | Pay Now
   
   p.text-center.m-t-1(data-i18n="TODO")
     | We accept all major credit cards.
   
-  p.small.m-t-3(data-i18n="TODO")
-    | Teachers can purchase up to {{starter_license_quantity_limit}} Starter Licenses. If you need more, contact support@codecombat.com. Starter Licenses are valid for {{starter_license_length_months}} months.
-    
-    
+  p.text-center.purchase-progress-message
+    = state.get('purchaseProgressMessage')
+  
+  p.small.m-t-5(data-i18n="TODO")
+    span= translate('special_offer.license_limit_description', view.i18nData())
+
+block modal-footer
