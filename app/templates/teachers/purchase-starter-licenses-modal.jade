@@ -12,19 +12,20 @@ block modal-body-content
   .text-center.input-row.m-t-3.m-b-3
     input(name="quantity", type="number", min=0, max=state.get('quantityAllowedToPurchase'), value=state.get('quantityToBuy'))
     span x
-    span.dollar-value= view.getPricePerStudentString()
+    span.dollar-value.render= view.getPricePerStudentString()
     span =
-    span.dollar-value= view.getTotalPriceString()
+    span.dollar-value.render= view.getTotalPriceString()
   
-  .text-center
-    button.pay-now-btn.btn-lg.btn-navy
+  .text-center.render
+    - var quantityIsValid = (state.get('quantityToBuy') > 0)
+    button.pay-now-btn.btn-lg.btn-navy(disabled=!quantityIsValid, className=(quantityIsValid ? 'disabled' : ''))
       span(data-i18n="TODO")
         | Pay Now
   
   p.text-center.m-t-1(data-i18n="TODO")
     | We accept all major credit cards.
   
-  p.text-center.purchase-progress-message
+  p.text-center.purchase-progress-message.render
     = state.get('purchaseProgressMessage')
   
   p.small.m-t-5(data-i18n="TODO")

@@ -42,7 +42,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
         quantityAlreadyPurchased: starterLicenses.totalMaxRedeemers()
         quantityAllowedToPurchase: @maxQuantityStarterLicenses - starterLicenses.totalMaxRedeemers()
       }
-    @listenTo @state, 'change', => @renderSelectors('.dollar-value', '.purchase-progress-message')
+    @listenTo @state, 'change', => @renderSelectors('.render')
     super(options)
   
   onLoaded: ->
@@ -50,15 +50,16 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     
   getPricePerStudentString: -> utils.formatDollarValue(@state.get('pricePerStudent'))
   getTotalPriceString: -> utils.formatDollarValue(@state.get('pricePerStudent') * @state.get('quantityToBuy'))
-
-    
   
+  boundedValue: (value) ->
+    Math.max(Math.min(value, @maxQuantityStarterLicenses - @state.get('quantityAlreadyPurchased')), 0)
+    
   onInputQuantity: (e) ->
     $input = $(e.currentTarget)
     inputValue = parseFloat($input.val()) or 0
     boundedValue = inputValue
     if $input.val() isnt ''
-      boundedValue = Math.max(Math.min(inputValue, @maxQuantityStarterLicenses - @state.get('quantityAlreadyPurchased')), 0)
+      boundedValue = @boundedValue(inputValue)
       if boundedValue isnt inputValue
         $input.val(boundedValue)
     @state.set { quantityToBuy: boundedValue }
