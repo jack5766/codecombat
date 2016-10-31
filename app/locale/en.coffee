@@ -1473,6 +1473,7 @@
     available_credits: "Available Licenses"
     pending_credits: "Pending Licenses"
     credits: "licenses"
+    starter_licenses: "starter licenses"
     start_date: "start date:"
     end_date: "end date:"
     get_enrollments_blurb: " We'll help you build a solution that meets the needs of your class, school or district."

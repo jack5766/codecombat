@@ -73,7 +73,7 @@ productStubs = [
 
   {
     name: 'starter_license'
-    amount: 10
+    amount: 100
   }
 
   {

@@ -93,7 +93,10 @@ block content
 mixin prepaidCard(prepaid, className)
   .prepaid-card.bg-navy.text-center.m-b-2.p-a-2(class=className)
     h1.m-t-2.m-b-0= prepaid.openSpots()
-    div(data-i18n="teacher.credits")
+    if prepaid.get('type') === 'starter_license'
+      div(data-i18n="teacher.starter_licenses")
+    else
+      div(data-i18n="teacher.credits")
     hr
     em.small-details
       .pull-left(data-i18n="teacher.start_date")
