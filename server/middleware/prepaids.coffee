@@ -4,12 +4,14 @@ database = require '../commons/database'
 mongoose = require 'mongoose'
 LevelSession = require '../models/LevelSession'
 Prepaid = require '../models/Prepaid'
+Product = require '../models/Product'
 Promise = require 'bluebird'
 TrialRequest = require '../models/TrialRequest'
 User = require '../models/User'
 StripeUtils = require '../lib/stripe_utils'
 Promise.promisifyAll(StripeUtils)
 moment = require 'moment'
+slack = require '../slack'
 
 cutoffDate = new Date(2015,11,11)
 cutoffID = mongoose.Types.ObjectId(Math.floor(cutoffDate/1000).toString(16)+'0000000000000000')
@@ -125,7 +127,7 @@ module.exports =
     if req.body.type not in ['starter_license']
       throw new errors.Forbidden("License type invalid: #{req.body.type}")
 
-    user = req.user
+    creator = req.user
     maxRedeemers = parseInt(req.body.maxRedeemers)
     months = parseInt(req.body.months)
     token = req.body.stripe?.token
@@ -135,7 +137,7 @@ module.exports =
       throw new errors.UnprocessableEntity("Invalid number of licenses to buy: #{maxRedeemers}")
 
     alreadyOwnedStarterLicenses = yield Prepaid.find({
-      creator: mongoose.Types.ObjectId(req.user.id)
+      creator: mongoose.Types.ObjectId(creator.id)
       type: 'starter_license'
     }).exec()
     alreadyOwnedStarterLicenseCount = alreadyOwnedStarterLicenses.map((prepaid) -> prepaid.get('maxRedeemers')).reduce(((a,b) -> a+b), 0)
@@ -143,12 +145,12 @@ module.exports =
     if maxRedeemers + alreadyOwnedStarterLicenseCount > Prepaid.MAX_STARTER_LICENSES
       throw new errors.Forbidden('You cannot own more than 75 starter licenses.')
     
-    if not (token or user.isAdmin())
+    if not (token or creator.isAdmin())
       throw new errors.UnprocessableEntity('Missing required Stripe token')
 
-    if user.isAdmin()
+    if creator.isAdmin()
       try
-        yield createStarterLicense({ creator: user.id, maxRedeemers })
+        yield createStarterLicense({ creator: creator.id, maxRedeemers })
         res.status(200).send(prepaid)
       catch e
         throw new errors.InternalServerError("Database error: #{e.message}")
@@ -157,30 +159,31 @@ module.exports =
       product = yield Product.findOne({ name: 'starter_license' })
 
       try
-        customer = yield StripeUtils.getCustomerAsync(req.user, token)
+        customer = yield StripeUtils.getCustomerAsync(creator, token)
       catch e
-        logError(user, "Stripe getCustomer error: #{JSON.stringify(err)}")
+        logError(creator, "Stripe getCustomer error: #{JSON.stringify(err)}")
       metadata =
-        type: type
-        userID: user.id
+        type: 'starter_license'
+        userID: creator.id
         timestamp: parseInt(timestamp)
         maxRedeemers: maxRedeemers
-        productID: "prepaid #{type}"
+        productID: "prepaid starter_license"
 
       totalAmount = maxRedeemers * product.get('amount')
       try
-        charge = yield StripeUtils.createChargeAsync(user, totalAmount, metadata)
-        prepaid = yield createStarterLicense({ user, maxRedeemers })
-        payment = yield StripeUtils.createPaymentAsync(user, charge, {prepaidID: prepaid._id})
-        msg = "#{user.get('email')} paid #{payment.get('amount')} for #{type} prepaid redeemers=#{maxRedeemers} months=#{months}"
+        charge = yield StripeUtils.createChargeAsync(creator, totalAmount, metadata)
+        prepaid = yield createStarterLicense({ creator: creator.id, maxRedeemers })
+        payment = yield StripeUtils.createPaymentAsync(creator, charge, {prepaidID: prepaid._id})
+        msg = "#{creator.get('email')} paid #{payment.get('amount')} for starter_license prepaid redeemers=#{maxRedeemers}"
         slack.sendSlackMessage msg, ['tower']
         res.status(200).send(prepaid)
-      catch e
-        @logError(user, "getCustomer error: #{JSON.stringify(err)}")
+      catch err
+        logError(creator, "getCustomer error: #{JSON.stringify(err)}")
+        throw(err)
 
 createStarterLicense = wrap ({ creator, maxRedeemers }) ->
   yield createPrepaid({
-    creator
+    creator: creator
     type: 'starter_license'
     maxRedeemers, properties: {}
     startDate: (moment()).toISOString()
