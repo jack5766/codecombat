@@ -133,7 +133,15 @@ module.exports =
 
     if isNaN(maxRedeemers) or maxRedeemers < 1
       throw new errors.UnprocessableEntity("Invalid number of licenses to buy: #{maxRedeemers}")
-    # TODO: Check how many starter licenses they already have, make sure they don't get >75 total
+
+    alreadyOwnedStarterLicenses = yield Prepaid.find({
+      creator: mongoose.Types.ObjectId(req.user.id)
+      type: 'starter_license'
+    }).exec()
+    alreadyOwnedStarterLicenseCount = alreadyOwnedStarterLicenses.map((prepaid) -> prepaid.get('maxRedeemers')).reduce(((a,b) -> a+b), 0)
+
+    if maxRedeemers + alreadyOwnedStarterLicenseCount > Prepaid.MAX_STARTER_LICENSES
+      throw new errors.Forbidden('You cannot own more than 75 starter licenses.')
     
     if not (token or user.isAdmin())
       throw new errors.UnprocessableEntity('Missing required Stripe token')

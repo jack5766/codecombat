@@ -38,9 +38,12 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     @supermodel.trackRequest @prepaids.fetchByCreator(me.id)
     @listenTo @prepaids, 'sync change update', ->
       starterLicenses = new Prepaids(@prepaids.where({ type: 'starter_license' }))
+      quantityAlreadyPurchased = starterLicenses.totalMaxRedeemers()
+      quantityAllowedToPurchase = @maxQuantityStarterLicenses - quantityAlreadyPurchased
       @state.set {
-        quantityAlreadyPurchased: starterLicenses.totalMaxRedeemers()
-        quantityAllowedToPurchase: @maxQuantityStarterLicenses - starterLicenses.totalMaxRedeemers()
+        quantityAlreadyPurchased
+        quantityAllowedToPurchase
+        quantityToBuy: Math.min(@state.get('quantityToBuy'), quantityAllowedToPurchase)
       }
     @listenTo @state, 'change', => @renderSelectors('.render')
     super(options)
@@ -52,7 +55,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
   getTotalPriceString: -> utils.formatDollarValue(@state.get('pricePerStudent') * @state.get('quantityToBuy'))
   
   boundedValue: (value) ->
-    Math.max(Math.min(value, @maxQuantityStarterLicenses - @state.get('quantityAlreadyPurchased')), 0)
+    Math.max(Math.min(value, @state.get('quantityAllowedToPurchase')), 0)
     
   onInputQuantity: (e) ->
     $input = $(e.currentTarget)
@@ -110,7 +113,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
         else
           @state.set({
             purchaseProgress: 'error'
-            purchaseProgressMessage: "#{jqxhr.status}: #{jqxhr.responseText}"
+            purchaseProgressMessage: "#{jqxhr.status}: #{jqxhr.responseJSON?.message or 'Unknown Error'}"
           })
         @render?()
     })
