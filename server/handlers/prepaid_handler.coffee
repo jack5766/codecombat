@@ -66,7 +66,7 @@ PrepaidHandler = class PrepaidHandler extends Handler
     type = req.body.type
     maxRedeemers = req.body.maxRedeemers
 
-    if req.body.type is 'course'
+    if req.body.type is ['course', 'starter_license']
       return @sendDatabaseError(res, "TODO: need to add courseIDs")
     else if req.body.type is 'subscription'
       properties.couponID = 'free'

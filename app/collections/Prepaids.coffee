@@ -8,6 +8,14 @@ module.exports = class Prepaids extends CocoCollection
 
   url: "/db/prepaid"
   
+  initialize: ->
+    @comparator = (prepaid) ->
+      [
+        if prepaid.get('type') is 'course' then 'C' else 'S'
+        prepaid.id
+      ].toString()
+    super(arguments...)
+
   totalMaxRedeemers: ->
     sum((prepaid.get('maxRedeemers') for prepaid in @models)) or 0
     

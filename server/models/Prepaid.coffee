@@ -47,7 +47,7 @@ PrepaidSchema.pre('save', (next) ->
 
 PrepaidSchema.post 'init', (doc) ->
   doc.set('maxRedeemers', parseInt(doc.get('maxRedeemers') ? 0))
-  if @get('type') is 'course'
+  if @get('type') in ['course', 'starter_license']
     if not @get('startDate')
       @set('startDate', Prepaid.DEFAULT_START_DATE)
     if not @get('endDate')
@@ -57,7 +57,7 @@ PrepaidSchema.methods.redeem = co.wrap (user) ->
   if @get('endDate') and new Date(@get('endDate')) < new Date()
     throw new errors.Forbidden('This prepaid is expired')
   
-  if @get('type') is 'course'
+  if @get('type') in ['course', 'starter_license']
     cutoffDate = new Date(2015,11,11)
     if @_id.getTimestamp().getTime() < cutoffDate.getTime()
       throw new errors.Forbidden('Cannot redeem from prepaids older than November 11, 2015')
@@ -88,7 +88,7 @@ PrepaidSchema.methods.redeem = co.wrap (user) ->
   if result.nModified isnt 1
     throw new errors.Forbidden('Can\'t add user to prepaid redeemers')
     
-  if @get('type') is 'course'
+  if @get('type') in ['course', 'starter_license']
     update = {
       $set: {
         coursePrepaid: {

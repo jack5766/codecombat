@@ -398,6 +398,7 @@ module.exports = class TeacherClassView extends RootView
     remainingSpots = 0
     
     return Promise.resolve()
+    # Find or make the necessary course instances
     .then =>
       courseInstance = @courseInstances.findWhere({ courseID, classroomID: @classroom.id })
       if not courseInstance
@@ -411,8 +412,9 @@ module.exports = class TeacherClassView extends RootView
         @courseInstances.add(courseInstance)
         return courseInstance.save()
         
+    # Automatically apply licenses to students if necessary
     .then =>
-      availablePrepaids = @prepaids.filter((prepaid) -> prepaid.status() is 'available')
+      availablePrepaids = @prepaids.filter((prepaid) -> prepaid.status() is 'available' and prepaid.includesCourse(courseID))
       unenrolledStudents = _(members)
         .map((userID) => @students.get(userID))
         .filter((user) => user.prepaidStatus() isnt 'enrolled')
@@ -442,6 +444,7 @@ module.exports = class TeacherClassView extends RootView
       @trigger 'begin-redeem-for-assign-course'
       return $.when(requests...)
 
+    # Add the students to the course instances
     .then =>
       # refresh prepaids, since the racing multiple parallel redeem requests in the previous `then` probably did not
       # end up returning the final result of all those requests together.
@@ -451,6 +454,7 @@ module.exports = class TeacherClassView extends RootView
       if members.length
         return courseInstance.addMembers(members)
       
+    # Show a success/errror notification
     .then =>
       course = @courses.get(courseID)
       lines = [

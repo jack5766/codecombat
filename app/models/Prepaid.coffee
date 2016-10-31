@@ -41,3 +41,11 @@ module.exports = class Prepaid extends CocoModel
     options.data ?= {}
     options.data.userID = user.id or user
     @fetch(options)
+
+  # TODO: Make this less stubby
+  includesCourse: (course) ->
+    courseID = course.get?('name') or course
+    if @get('type') is 'starter_license'
+      return courseID in ['560f1a9f22961295f9427742', '5632661322961295f9428638', '5789587aad86a6efb573701f', '5789587aad86a6efb573701e']
+    else
+      return true

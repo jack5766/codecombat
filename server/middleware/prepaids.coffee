@@ -52,8 +52,8 @@ module.exports =
 
     unless prepaid.get('creator').equals(req.user._id)
       throw new errors.Forbidden('You may not redeem licenses from this prepaid')
-    unless prepaid.get('type') is 'course'
-      throw new errors.Forbidden('This prepaid is not of type "course"')
+    unless prepaid.get('type') in ['course', 'starter_license']
+      throw new errors.Forbidden('This prepaid is not of type "course" or "starter_license"')
     if user.isEnrolled()
       return res.status(200).send(prepaid.toObject({req: req}))
 
@@ -186,8 +186,8 @@ createStarterLicense = wrap ({ creator, maxRedeemers }) ->
     creator: creator
     type: 'starter_license'
     maxRedeemers, properties: {}
-    startDate: (moment()).toISOString()
-    endDate: moment().add(6, 'months')
+    startDate: moment().toISOString()
+    endDate: moment().add(6, 'months').toISOString()
   })
 
 createPrepaid = wrap ({ creator, type, maxRedeemers, properties, startDate, endDate }) ->
