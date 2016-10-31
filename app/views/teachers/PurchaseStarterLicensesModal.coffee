@@ -25,7 +25,8 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     @listenTo stripeHandler, 'received-token', @onStripeReceivedToken
     @state = new State({
       quantityToBuy: 10
-      pricePerStudent: undefined
+      centsPerStudent: undefined
+      dollarsPerStudent: undefined
       quantityAlreadyPurchased: undefined
       quantityAllowedToPurchase: undefined
     })
@@ -33,7 +34,10 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     @supermodel.loadCollection(@products, 'products')
     @listenTo @products, 'sync change update', ->
       starterLicense = @products.findWhere({ name: 'starter_license' })
-      @state.set { pricePerStudent: starterLicense.get('amount')/100 }
+      @state.set {
+        centsPerStudent: starterLicense.get('amount')
+        dollarsPerStudent: starterLicense.get('amount')/100
+      }
     @prepaids = new Prepaids()
     @supermodel.trackRequest @prepaids.fetchByCreator(me.id)
     @listenTo @prepaids, 'sync change update', ->
@@ -51,8 +55,8 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
   onLoaded: ->
     super()
     
-  getPricePerStudentString: -> utils.formatDollarValue(@state.get('pricePerStudent'))
-  getTotalPriceString: -> utils.formatDollarValue(@state.get('pricePerStudent') * @state.get('quantityToBuy'))
+  getDollarsPerStudentString: -> utils.formatDollarValue(@state.get('dollarsPerStudent'))
+  getTotalPriceString: -> utils.formatDollarValue(@state.get('dollarsPerStudent') * @state.get('quantityToBuy'))
   
   boundedValue: (value) ->
     Math.max(Math.min(value, @state.get('quantityAllowedToPurchase')), 0)
@@ -74,10 +78,10 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
     })
     
     application.tracker?.trackEvent 'Started course prepaid purchase', {
-      price: @state.get('pricePerStudent'), students: @state.get('quantityToBuy')
+      price: @state.get('centsPerStudent'), students: @state.get('quantityToBuy')
     }
     stripeHandler.open
-      amount: @state.get('quantityToBuy') * @state.get('pricePerStudent') * 100
+      amount: @state.get('quantityToBuy') * @state.get('centsPerStudent')
       description: "Starter course access for #{@state.get('quantityToBuy')} students"
       bitcoin: true
       alipay: if me.get('country') is 'china' or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
@@ -99,7 +103,7 @@ module.exports = class PurchaseStarterLicensesModal extends ModalView
       method: 'POST',
       context: @
       success: ->
-        application.tracker?.trackEvent 'Finished starter license purchase', {price: @state.get('pricePerStudent'), seats: @state.get('quantityToBuy')}
+        application.tracker?.trackEvent 'Finished starter license purchase', {price: @state.get('centsPerStudent'), seats: @state.get('quantityToBuy')}
         @state.set({ purchaseProgress: 'purchased' })
         application.router.navigate('/teachers/licenses', { trigger: true })
 

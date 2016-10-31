@@ -12,7 +12,7 @@ block modal-body-content
   .text-center.input-row.m-t-3.m-b-3
     input(name="quantity", type="number", min=0, max=state.get('quantityAllowedToPurchase'), value=state.get('quantityToBuy'))
     span x
-    span.dollar-value.render= view.getPricePerStudentString()
+    span.dollar-value.render= view.getDollarsPerStudentString()
     span =
     span.dollar-value.render= view.getTotalPriceString()
   

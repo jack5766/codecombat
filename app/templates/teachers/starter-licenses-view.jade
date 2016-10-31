@@ -27,7 +27,7 @@ block content
         p.small(data-i18n="special_offer.great_for_clubs_description")
       .checkmark-blurb.col-xs-4.text-center
         span.fa.fa-check(aria-hidden=true)
-        h5= translate('special_offer.low_price_title', {'starter_license_price': view.state.get('pricePerStudent')})
+        h5= translate('special_offer.low_price_title', {'starter_license_price': '$' + view.state.get('dollarsPerStudent')})
         p.small(data-i18n="special_offer.low_price_description")
   
     .row.text-center.tall-margin-top
@@ -131,7 +131,7 @@ block content
           //- TODO: Do we localize prices at all?
           td.special-offer-col
             | $
-            = view.state.get('pricePerStudent')
+            = view.state.get('dollarsPerStudent')
             =' '
             | per student
           td Contact Us

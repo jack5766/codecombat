@@ -1,5 +1,6 @@
 RootView = require 'views/core/RootView'
 State = require 'models/State'
+Products = require 'collections/Products'
 PurchaseStarterLicensesModal = require 'views/teachers/PurchaseStarterLicensesModal'
 TeachersContactModal = require 'views/teachers/TeachersContactModal'
 
@@ -13,8 +14,17 @@ module.exports = class StarterLicensesView extends RootView
 
   initialize: (options) ->
     @state = new State({
-      pricePerStudent: 1000
+      dollarsPerStudent: undefined
     })
+    @products = new Products()
+    @supermodel.trackRequest @products.fetch()
+    @listenTo @products, 'sync', ->
+      centsPerStudent = @products.getByName('starter_license')?.get('amount')
+      @state.set {
+        dollarsPerStudent: centsPerStudent/100
+      }
+    @listenTo @state, 'change', ->
+      @render()
 
   onClickPurchaseButton: ->
     @openModalView(new PurchaseStarterLicensesModal())

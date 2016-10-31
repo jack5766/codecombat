@@ -857,7 +857,7 @@
     project_based_description: "Web and Game Development courses feature shareable final projects."
     great_for_clubs_title: "Great for clubs and electives"
     great_for_clubs_description: "Teachers can purchase up to 75 Starter Licenses per year."
-    low_price_title: "Just $__starter_license_price__ per student"
+    low_price_title: "Just __starter_license_price__ per student"
     low_price_description: "Starter Licenses are active for 6 months from purchase."
     license_limit_description: "Teachers can purchase up to __maxQuantityStarterLicenses__ Starter Licenses. You have already purchased __quantityAlreadyPurchased__. If you need more, contact support@codecombat.com. Starter Licenses are valid for __starterLicenseLengthMonths__ months."
 
