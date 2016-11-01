@@ -90,7 +90,7 @@ module.exports = class SaveBranchModal extends ModalView
     # insert delta subviews for the selected branch, including the 'headComponent' which shows
     # what, if any, conflicts the existing branch has with the client's local changes
     
-    @removeSubView(view) for view in @selectedBranchDeltaViews if @@selectedBranchDeltaViews
+    @removeSubView(view) for view in @selectedBranchDeltaViews if @selectedBranchDeltaViews
     @selectedBranchDeltaViews = []
     @renderSelectors('#selected-branch-col')
     changeEls = @$el.find('#selected-branch-col .component-changes-stub')
