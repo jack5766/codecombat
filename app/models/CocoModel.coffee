@@ -50,6 +50,10 @@ class CocoModel extends Backbone.Model
     # Backbone does not support nested documents
     clone = super()
     clone.set($.extend(true, {}, if withChanges then @attributes else @_revertAttributes))
+    if not withChanges
+      # remove any keys that are in the current attributes not in the snapshot
+      for key in _.difference(_.keys(clone.attributes), _.keys(@_revertAttributes))
+        clone.unset(key)
     clone
 
   onError: (level, jqxhr) ->
@@ -372,6 +376,21 @@ class CocoModel extends Backbone.Model
 
   getURL: ->
     return if _.isString @url then @url else @url()
+    
+  makePatch: ->
+    Patch = require 'models/Patch'
+    target = {
+      'collection': _.string.underscored @constructor.className
+      'id': @id
+    }
+    if @get('original')
+      target.original = @get('original')
+      target.version = @get('version')
+      
+    return new Patch({
+      delta: @getDelta()
+      target 
+    })
 
   @pollAchievements: ->
     return if application.testing

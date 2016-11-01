@@ -1,0 +1,44 @@
+extends /templates/core/modal-base-flat
+
+block modal-header-content
+  h3 Save Branch
+
+block modal-body-content
+  .container-fluid
+    .row
+      .col-sm-2
+        #branches-list-group.list-group
+          a.list-group-item.active
+            i New Branch
+            input.form-control(placeholder='Name')
+          for branch in view.branches.models
+            a.list-group-item(data-branch-cid=branch.cid)= branch.get('name')
+            
+      .col-sm-5
+        each component in view.componentsWithChanges.models
+          h4 Component: #{component.get('system')}.#{component.get('name')}
+          .component-changes-stub(data-component-id=component.id)
+          
+        each system in view.systemsWithChanges.models
+          h4 System: #{system.get('name')}
+          .system-changes-stub(data-system-id=system.id)
+
+      .col-sm-5#selected-branch-col
+        if view.selectedBranch
+          h2 Branch to be Overwritten
+          span= view.selectedBranch.get('name')
+          each component in view.selectedBranch.components.models
+            h4 Component: #{component.get('system')}.#{component.get('name')}
+            .component-changes-stub(data-component-id=component.id)
+
+          each system in view.selectedBranch.systems.models
+            h4 System: #{system.get('name')}
+            .system-changes-stub(data-system-id=system.id)
+          
+        else
+          h2 New Branch
+          
+            
+
+block modal-footer-content
+  button#save-branch-btn.btn.btn-primary Save Branch
