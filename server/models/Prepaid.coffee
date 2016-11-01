@@ -95,6 +95,8 @@ PrepaidSchema.methods.redeem = co.wrap (user) ->
           _id: @_id
           startDate: @get('startDate')
           endDate: @get('endDate')
+          type: @get('type')
+          includedCourseIDs: @get('includedCourseIDs')
         }
       }
     }

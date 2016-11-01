@@ -449,6 +449,7 @@ module.exports = class TeacherClassView extends RootView
       # refresh prepaids, since the racing multiple parallel redeem requests in the previous `then` probably did not
       # end up returning the final result of all those requests together.
       @prepaids.fetchByCreator(me.id)
+      @students.fetchForClassroom(@classroom, removeDeleted: true)
       
       @trigger 'begin-assign-course'
       if members.length

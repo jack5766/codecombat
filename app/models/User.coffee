@@ -254,6 +254,12 @@ module.exports = class User extends CocoModel
     return 'enrolled' unless coursePrepaid.endDate
     return if coursePrepaid.endDate > new Date().toISOString() then 'enrolled' else 'expired'
 
+  prepaidIncludesCourse: (course) ->
+    includedCourseIDs = @get('coursePrepaid')?.includedCourseIDs
+    courseID = course.id or course
+    # NOTE: Full licenses implicitly include all courses
+    return !includedCourseIDs or courseID in includedCourseIDs
+
   # Function meant for "me"
     
   spy: (user, options={}) ->
