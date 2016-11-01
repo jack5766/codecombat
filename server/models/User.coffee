@@ -350,10 +350,11 @@ UserSchema.methods.isEnrolled = ->
   return coursePrepaid.endDate > new Date().toISOString()
 
 UserSchema.methods.prepaidIncludesCourse = (course) ->
-  includedCourseIDs = @get('coursePrepaid')?.includedCourseIDs
+  return false if not @get('coursePrepaid')
+  includedCourseIDs = @get('coursePrepaid').includedCourseIDs
+  return true if !includedCourseIDs # NOTE: Full licenses implicitly include all courses
   courseID = course.id or course
-  # NOTE: Full licenses implicitly include all courses
-  return !includedCourseIDs or courseID.toString() in includedCourseIDs.map((id)->id.toString())
+  return courseID.toString() in includedCourseIDs.map((id)->id.toString())
 
 UserSchema.methods.hasLogInMethod = ->
   return true if _.any([
