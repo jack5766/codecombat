@@ -3,6 +3,7 @@ template = require 'templates/editor/level/modal/save-branch-modal'
 DeltaView = require 'views/editor/DeltaView'
 deltasLib = require 'core/deltas'
 Branch = require 'models/Branch'
+Branches = require 'collections/Branches'
 LevelComponents = require 'collections/LevelComponents'
 LevelSystems = require 'collections/LevelSystems'
 
@@ -25,7 +26,7 @@ module.exports = class SaveBranchModal extends ModalView
     @systemsWithChanges = new LevelSystems(@systems.filter((c) -> c.hasLocalChanges()))
     
     # Load existing branches
-    @branches = new Backbone.Collection([], {urlRoot:'/db/branches'})
+    @branches = new Branches()
     @branches.fetch({url: '/db/branches'})
     .then(=>
       
@@ -98,10 +99,11 @@ module.exports = class SaveBranchModal extends ModalView
       componentId = $(changeEl).data('component-id')
       component = @selectedBranch.components.get(componentId)
       targetComponent = @components.find((c) -> c.get('original') is component.get('original') and c.get('version').isLatestMajor)
-      headComponent = component.clone(false)
-      headComponent.markToRevert()
-      headComponent.set(targetComponent.attributes)
-      @selectedBranchDeltaViews.push(@insertDeltaView(component, changeEl, headComponent))
+      preBranchSave = component.clone()
+      preBranchSave.markToRevert()
+      componentDiff = targetComponent.clone()
+      preBranchSave.set(componentDiff.attributes)
+      @selectedBranchDeltaViews.push(@insertDeltaView(preBranchSave, changeEl))
 
     changeEls = @$el.find('#selected-branch-col .system-changes-stub')
     for changeEl in changeEls
@@ -120,13 +122,18 @@ module.exports = class SaveBranchModal extends ModalView
     @selectedBranch = if branchCid then @branches.get(branchCid) else null
     @renderSelectedBranch()
 
-  onClickSaveBranchButton: ->
+  onClickSaveBranchButton: (e) ->
     selectedBranch = @$('#branches-list-group .active')
     branchCid = selectedBranch.data('branch-cid')
     if branchCid
-      branch = @branches.get(cid)
+      branch = @branches.get(branchCid)
     else
       name = selectedBranch.find('input').val()
+      if not name
+        return noty text: 'Name required', layout: 'topCenter', type: 'error', killer: false
+      slug = _.string.slugify(name)
+      if @branches.findWhere({slug})
+        return noty text: 'Name taken', layout: 'topCenter', type: 'error', killer: false
       branch = new Branch({name})
     
     patches = []
@@ -135,6 +142,15 @@ module.exports = class SaveBranchModal extends ModalView
     for system in @systemsWithChanges.models
       patches.push(system.makePatch().toJSON())
     branch.set({patches})
-    branch.save()
-    console.log(JSON.stringify(branch.toJSON(), null, '\t'))
+    jqxhr = branch.save()
+    button = $(e.currentTarget)
+    if not jqxhr
+      return button.text('Save Failed')
+      
+    button.attr('disabled', true).text('Saving...')
+    Promise.resolve(jqxhr)
+    .then =>
+      @hide()
+    .catch =>
+      button.attr('disabled', false).text('Save Failed')
     

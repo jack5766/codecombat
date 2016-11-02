@@ -14,7 +14,7 @@ makeBranch = (attrs={}, {systems, components}) ->
   return branch
 
 describe 'SaveBranchModal', ->
-  it 'saves a new branch with ', (done) ->
+  it 'saves a new branch with all local changes to systems and components', (done) ->
     
     # a couple that don't have changes
     component = factories.makeLevelComponent({name: 'Unchanged Component'})
@@ -76,8 +76,14 @@ describe 'SaveBranchModal', ->
         status: 200,
         responseText: JSON.stringify(componentV0.toJSON())
       })
-#      modal.$('#branches-list-group input').val('Branch Name')
-#      modal.$('#save-branch-btn').click()
-#      saveBranchRequest = jasmine.Ajax.requests.mostRecent()
-#      console.log 'save branch request', saveBranchRequest
+      modal.$('#branches-list-group input').val('Branch Name')
+      modal.$('#save-branch-btn').click()
+      saveBranchRequest = jasmine.Ajax.requests.mostRecent()
+      expect(saveBranchRequest.url).toBe('/db/branches')
+      expect(saveBranchRequest.method).toBe('POST')
+      body = JSON.parse(saveBranchRequest.params)
+      expect(body.patches.length).toBe(2)
+      targetIds = _.map(body.patches, (patch) -> patch.id)
+      expect(_.contains(targetIds, changedComponent.id))
+      expect(_.contains(targetIds, changedSystem.id))
       done()
