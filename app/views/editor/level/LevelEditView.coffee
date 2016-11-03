@@ -28,6 +28,7 @@ ArtisanGuideModal = require './modals/ArtisanGuideModal'
 ForkModal = require 'views/editor/ForkModal'
 SaveVersionModal = require 'views/editor/modal/SaveVersionModal'
 SaveBranchModal = require 'views/editor/level/modals/SaveBranchModal'
+LoadBranchModal = require 'views/editor/level/modals/LoadBranchModal'
 PatchesView = require 'views/editor/PatchesView'
 RelatedAchievementsView = require 'views/editor/level/RelatedAchievementsView'
 VersionHistoryView = require './modals/LevelVersionsModal'
@@ -74,6 +75,7 @@ module.exports = class LevelEditView extends RootView
     'click li:not(.disabled) > #pop-level-i18n-button': 'onPopulateI18N'
     'click a[href="#editor-level-documentation"]': 'onClickDocumentationTab'
     'click #save-branch': 'onClickSaveBranch'
+    'click #load-branch': 'onClickLoadBranch'
     'mouseup .nav-tabs > li a': 'toggleTab'
 
   constructor: (options, @levelID) ->
@@ -252,6 +254,12 @@ module.exports = class LevelEditView extends RootView
     components = new LevelComponents(@supermodel.getModels(LevelComponent))
     systems = new LevelSystems(@supermodel.getModels(LevelSystem))
     @openModalView new SaveBranchModal({components, systems})
+    Backbone.Mediator.publish 'editor:view-switched', {}
+
+  onClickLoadBranch: ->
+    components = new LevelComponents(@supermodel.getModels(LevelComponent))
+    systems = new LevelSystems(@supermodel.getModels(LevelSystem))
+    @openModalView new LoadBranchModal({components, systems})
     Backbone.Mediator.publish 'editor:view-switched', {}
 
   toggleTab: (e) ->
