@@ -15,7 +15,7 @@ module.exports = class SaveBranchModal extends ModalView
   events:
     'click #save-branch-btn': 'onClickSaveBranchButton'
     'click #branches-list-group .list-group-item': 'onClickBranch'
-    
+    'click .delete-branch-btn': 'onClickDeleteBranchButton'
 
   initialize: (options = {}) ->
     # Should be given all loaded, up to date systems and components with existing changes
@@ -124,12 +124,10 @@ module.exports = class SaveBranchModal extends ModalView
     @renderSelectedBranch()
 
   onClickSaveBranchButton: (e) ->
-    selectedBranch = @$('#branches-list-group .active')
-    branchCid = selectedBranch.data('branch-cid')
-    if branchCid
-      branch = @branches.get(branchCid)
+    if @selectedBranch
+      branch = @selectedBranch
     else
-      name = selectedBranch.find('input').val()
+      name = @$('#new-branch-name-input').val()
       if not name
         return noty text: 'Name required', layout: 'topCenter', type: 'error', killer: false
       slug = _.string.slugify(name)
@@ -157,4 +155,16 @@ module.exports = class SaveBranchModal extends ModalView
       @hide()
     .catch =>
       button.attr('disabled', false).text('Save Failed')
-    
+
+  onClickDeleteBranchButton: (e) ->
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    branchCid = $(e.currentTarget).closest('.list-group-item').data('branch-cid')
+    branch = @branches.get(branchCid)
+    return unless confirm('Really delete this branch?')
+    branch.destroy()
+    @branches.remove(branch)
+    if branch is @selectedBranch
+      @selectedBranch = null
+      @renderSelectedBranch()
+    $(e.currentTarget).closest('.list-group-item').remove()

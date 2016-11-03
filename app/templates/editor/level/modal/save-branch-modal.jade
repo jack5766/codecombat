@@ -10,9 +10,11 @@ block modal-body-content
         #branches-list-group.list-group
           a.list-group-item.active
             i New Branch
-            input.form-control(placeholder='Name')
+            input#new-branch-name-input.form-control(placeholder='Name')
           for branch in view.branches.models
-            a.list-group-item(data-branch-cid=branch.cid)= branch.get('name')
+            a.list-group-item(data-branch-cid=branch.cid)
+              = branch.get('name')
+              span.delete-branch-btn.glyphicon.glyphicon-remove.pull-right
             
       .col-sm-5
         h2 Changes from Prod

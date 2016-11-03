@@ -9,7 +9,9 @@ block modal-body-content
       .col-sm-2
         #branches-list-group.list-group
           for branch, i in view.branches.models
-            a.list-group-item(class=i == 0 ? 'active' : '', data-branch-cid=branch.cid)= branch.get('name')
+            a.list-group-item(class=i == 0 ? 'active' : '', data-branch-cid=branch.cid)
+              = branch.get('name')
+              span.delete-branch-btn.glyphicon.glyphicon-remove.pull-right
             
       #selected-branch-col.col-sm-10
         if view.selectedBranch

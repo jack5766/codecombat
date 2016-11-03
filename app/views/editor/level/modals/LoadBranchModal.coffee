@@ -15,6 +15,7 @@ module.exports = class LoadBranchModal extends ModalView
   events:
     'click #load-branch-btn': 'onClickLoadBranchButton'
     'click #branches-list-group .list-group-item': 'onClickBranch'
+    'click .delete-branch-btn': 'onClickDeleteBranchButton'
     
 
   initialize: (options = {}) ->
@@ -139,3 +140,16 @@ module.exports = class LoadBranchModal extends ModalView
         if not postLoadChange.has(key)
           currentModel.unset(key)
     @hide()
+
+  onClickDeleteBranchButton: (e) ->
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    branchCid = $(e.currentTarget).closest('.list-group-item').data('branch-cid')
+    branch = @branches.get(branchCid)
+    return unless confirm('Really delete this branch?')
+    branch.destroy()
+    @branches.remove(branch)
+    if branch is @selectedBranch
+      @selectedBranch = null
+      @renderSelectedBranch()
+    $(e.currentTarget).closest('.list-group-item').remove()

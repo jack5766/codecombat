@@ -68,6 +68,7 @@ module.exports.setup = (app) ->
   app.post('/db/branches', mw.rest.post(Branch))
   app.get('/db/branches', mw.rest.get(Branch))
   app.put('/db/branches/:handle', mw.rest.put(Branch))
+  app.delete('/db/branches/:handle', mw.rest.delete(Branch))
 
   Campaign = require '../models/Campaign'
   app.post('/db/campaign', mw.auth.checkHasPermission(['admin']), mw.rest.post(Campaign))
