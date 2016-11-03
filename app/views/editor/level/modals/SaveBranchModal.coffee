@@ -78,6 +78,7 @@ module.exports = class SaveBranchModal extends ModalView
     for changeEl in changeEls
       systemId = $(changeEl).data('system-id')
       system = @systemsWithChanges.find((c) -> c.id is systemId)
+      @insertDeltaView(system, changeEl)
       
   insertDeltaView: (model, changeEl, headModel) ->
     try
@@ -137,9 +138,12 @@ module.exports = class SaveBranchModal extends ModalView
       branch = new Branch({name})
     
     patches = []
-    for component in @componentsWithChanges.models
+    selectedComponents = _.map(@$('.component-checkbox:checked'), (checkbox) => @componentsWithChanges.get($(checkbox).data('component-id')))
+    for component in selectedComponents
       patches.push(component.makePatch().toJSON())
-    for system in @systemsWithChanges.models
+    
+    selectedSystems = _.map(@$('.system-checkbox:checked'), (checkbox) => @systemsWithChanges.get($(checkbox).data('system-id')))
+    for system in selectedSystems
       patches.push(system.makePatch().toJSON())
     branch.set({patches})
     jqxhr = branch.save()

@@ -15,18 +15,27 @@ block modal-body-content
             a.list-group-item(data-branch-cid=branch.cid)= branch.get('name')
             
       .col-sm-5
+        h2 Changes from Prod
         each component in view.componentsWithChanges.models
-          h4 Component: #{component.get('system')}.#{component.get('name')}
+          h4.checkbox
+            label
+              input.component-checkbox(type="checkbox", data-component-id=component.id checked=true)
+              =" "
+              | Component: #{component.get('system')}.#{component.get('name')}
           .component-changes-stub(data-component-id=component.id)
           
+          
         each system in view.systemsWithChanges.models
-          h4 System: #{system.get('name')}
+          h4.checkbox
+            label
+              input.system-checkbox(type="checkbox", data-system-id=system.id checked=true)
+              =" "
+              | System: #{system.get('name')}
           .system-changes-stub(data-system-id=system.id)
 
       .col-sm-5#selected-branch-col
         if view.selectedBranch
-          h2 Branch to be Overwritten
-          span= view.selectedBranch.get('name')
+          h2 Changes from Branch
           each component in view.selectedBranch.components.models
             h4 Component: #{component.get('system')}.#{component.get('name')}
             .component-changes-stub(data-component-id=component.id)
