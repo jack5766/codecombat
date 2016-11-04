@@ -10,6 +10,8 @@ BranchSchema = {
         # TODO: Link to Patch schema
       }
     }
+    updated: c.stringDate()
+    updatedBy: c.objectId()
   }
 }
 
