@@ -14,6 +14,7 @@ module.exports = class LoadBranchModal extends ModalView
   modalWidthPercent: 99
   events:
     'click #load-branch-btn': 'onClickLoadBranchButton'
+    'click #unstash-branch-btn': 'onClickUnstashBranchButton'
     'click #branches-list-group .list-group-item': 'onClickBranch'
     'click .delete-branch-btn': 'onClickDeleteBranchButton'
     
@@ -127,7 +128,13 @@ module.exports = class LoadBranchModal extends ModalView
     @selectedBranch = @branches.get(branchCid)
     @renderSelectedBranch()
 
-  onClickLoadBranchButton: ->
+  onClickUnstashBranchButton: (e) ->
+    @loadBranch({deleteBranch: true})
+
+  onClickLoadBranchButton: (e) ->
+    @loadBranch({deleteBranch: false})
+
+  loadBranch: ({deleteBranch}) ->
     selectedBranch = @$('#branches-list-group .active')
     branchCid = selectedBranch.data('branch-cid')
     branch = @branches.get(branchCid)
@@ -139,6 +146,8 @@ module.exports = class LoadBranchModal extends ModalView
       for key in currentModel.keys()
         if not postLoadChange.has(key)
           currentModel.unset(key)
+    if deleteBranch
+      Promise.resolve(branch.destroy()).catch((e) => noty text: 'Failed to delete branch after unstashing', layout: 'topCenter', type: 'error', killer: false)
     @hide()
 
   onClickDeleteBranchButton: (e) ->

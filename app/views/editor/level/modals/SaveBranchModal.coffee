@@ -16,6 +16,7 @@ module.exports = class SaveBranchModal extends ModalView
     'click #save-branch-btn': 'onClickSaveBranchButton'
     'click #branches-list-group .list-group-item': 'onClickBranch'
     'click .delete-branch-btn': 'onClickDeleteBranchButton'
+    'click #stash-branch-btn': 'onClickStashBranchButton'
 
   initialize: (options = {}) ->
     # Should be given all loaded, up to date systems and components with existing changes
@@ -111,10 +112,11 @@ module.exports = class SaveBranchModal extends ModalView
       systemId = $(changeEl).data('system-id')
       system = @selectedBranch.systems.get(systemId)
       targetSystem = @systems.find((c) -> c.get('original') is system.get('original') and c.get('version').isLatestMajor)
-      headSystem = system.clone(false)
-      headSystem.markToRevert()
-      headSystem.set(targetSystem.attributes)
-      @selectedBranchDeltaViews.push(@insertDeltaView(system, changeEl, headSystem))
+      preBranchSave = system.clone()
+      preBranchSave.markToRevert()
+      systemDiff = targetSystem.clone()
+      preBranchSave.set(systemDiff.attributes)
+      @selectedBranchDeltaViews.push(@insertDeltaView(preBranchSave, changeEl))
 
   onClickBranch: (e) ->
     $(e.currentTarget).closest('.list-group').find('.active').removeClass('active')
@@ -123,7 +125,13 @@ module.exports = class SaveBranchModal extends ModalView
     @selectedBranch = if branchCid then @branches.get(branchCid) else null
     @renderSelectedBranch()
 
+  onClickStashBranchButton: (e) ->
+    @deleteSavedChanges(e, {deleteSavedChanges: true})
+
   onClickSaveBranchButton: (e) ->
+    @deleteSavedChanges(e, {deleteSavedChanges: false})
+    
+  deleteSavedChanges: (e, {deleteSavedChanges}) ->
     if @selectedBranch
       branch = @selectedBranch
     else
@@ -136,13 +144,16 @@ module.exports = class SaveBranchModal extends ModalView
       branch = new Branch({name})
     
     patches = []
+    toRevert = []
     selectedComponents = _.map(@$('.component-checkbox:checked'), (checkbox) => @componentsWithChanges.get($(checkbox).data('component-id')))
     for component in selectedComponents
       patches.push(component.makePatch().toJSON())
+      toRevert.push(component)
     
     selectedSystems = _.map(@$('.system-checkbox:checked'), (checkbox) => @systemsWithChanges.get($(checkbox).data('system-id')))
     for system in selectedSystems
       patches.push(system.makePatch().toJSON())
+      toRevert.push(system)
     branch.set({patches})
     jqxhr = branch.save()
     button = $(e.currentTarget)
@@ -152,6 +163,8 @@ module.exports = class SaveBranchModal extends ModalView
     button.attr('disabled', true).text('Saving...')
     Promise.resolve(jqxhr)
     .then =>
+      if deleteSavedChanges
+        model.revert() for model in toRevert
       @hide()
     .catch =>
       button.attr('disabled', false).text('Save Failed')
